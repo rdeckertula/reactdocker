@@ -1,0 +1,21 @@
+language: generic
+# superuser needed in travis to execute build using docker
+sudo: required
+# We need a copy of docker
+services:
+  - docker
+
+# before_install hooks
+# as far as I can tell this is just a series of shell commands to be run at the before_install step
+before_install:
+  #- docker build -t rdeckertula/dockerreact -f Dockerfile.dev .
+  - docker build -t rdeckertula/docker-react -f Dockerfile.dev .
+
+# shell commands to actually run scripts with
+# if any of these return a non-zero status code then Travis assumes tests failed
+# [GOTCHA]:
+# Travis CI assumes that the test runs and then quits -- so we need to make sure that the test command quits
+script:
+  # pass in environmental variable using -e
+  # so, we are basically doing `export CI=true` inside of the running container
+  - docker run -e CI=true rdeckertula/docker-react npm run test
